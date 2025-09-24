@@ -1,7 +1,7 @@
 # COMMON_SPEC.md (Common Template for Swift / SwiftUI Projects)
 
 ## 目的
-- 本ドキュメントでは、AI 伴走開発を行う際の共通仕様・ルールを定義します。
+- 本ドキュメントでは、本リポジトリ配下で開発する Swift/Swift-UI プロジェクトに於いて AI 伴走開発を行う際の共通仕様・ルールを定義します。
 
 ## 技術スタック
 - 言語: Swift (最新安定版)
@@ -20,7 +20,7 @@
 - 設計パターン: MVVM を基本とします。
 - 実装修正の着手は、人間が許可してから行なってください。
 
-## ローカライズ
+## 国際化・ローカライズ
 - Localizable.strings, Localizable.stringsdict を必ず使用してください。
 - 翻訳キーはコメント付きで管理します。
 - Markdown 対応コメントを推奨します。
@@ -38,5 +38,5 @@
 - [Swift Testing](https://developer.apple.com/documentation/testing) を参照してください。
 
 ## ドキュメント
-- SPEC.md を AI伴走開発の基準とする
-- 必要に応じて派生 SPEC.md を追加
+- 各プロジェクトの個別仕様は、各リポジトリ内の `SPEC.md` に記載します。
+- 各プロジェクトでは、必要に応じて派生 SPEC.md を追加することがあります。
