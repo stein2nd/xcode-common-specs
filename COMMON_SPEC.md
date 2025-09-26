@@ -131,3 +131,106 @@
 * **Preview on device** を積極活用 (SwiftUI Preview + 実機同期)
 * **SwiftData / Observable** 等の新 API 利用時は、Appendix に仕様を追記
 * **Package Dependencies** は SwiftPM を利用し、外部ライブラリを導入する場合は `SPEC.md` に明記
+
+## Appendix B: Git 運用ルール
+
+* Git 管理下に含めるべきファイル・含めないファイルを明確にし、環境依存やビルド成果物を排除することで、再現性の高い開発環境を維持します。
+
+### 1. Git 管理に含めるべきファイル
+
+* プロジェクトファイル: `*.xcodeproj`, `*.xcworkspace`
+* 設定ファイル: `Info.plist`, `SPEC.md`
+* リソース: `Assets.xcassets`, `Localizable.strings`
+* ソースコード: `*.swift` など
+* 必要に応じて `Package.resolved` (依存バージョン固定を優先する場合)
+
+### 2. Git 管理から除外すべきファイル・フォルダ
+
+#### macOS 系
+
+```gitignore
+.DS_Store
+.AppleDouble
+.LSOverride
+```
+
+#### Xcode
+
+```gitignore
+build/
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+```
+
+#### Swift Package Manager
+
+```gitignore
+/.build
+/Packages
+Package.resolved
+```
+
+#### CocoaPods (利用する場合のみ)
+
+```gitignore
+Pods/
+*.lock
+!.gitignore
+```
+
+#### Carthage (利用する場合のみ)
+
+```gitignore
+Carthage/Build/
+```
+
+#### Fastlane
+
+```gitignore
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+```
+
+#### アーカイブ / IPA
+
+```gitignore
+*.xcarchive
+*.ipa
+*.dSYM.zip
+*.dSYM
+```
+
+#### Playground
+
+```gitignore
+timeline.xctimeline
+playground.xcworkspace
+```
+
+#### ログ / 一時ファイル
+
+```gitignore
+*.log
+*.swp
+*.swo
+*.tmp
+```
+
+#### 環境依存ファイル
+
+```gitignore
+*.env
+*.local
+```
+
+### 3. 運用ルール
+
+* `.gitignore` は **リポジトリルートに設置**し、全員が共通利用します。
+* `Package.resolved` のコミット有無は、チーム方針に従ってください。
+* 秘密情報 (API キーなど) を含む `.env` 系ファイルは必ず ignore してください。
+* Xcode のユーザー個別設定 (`xcuserdata`) はコミットしないでください。
+* 新規依存管理ツール導入時は `.gitignore` を更新し、Appendix B に追記してください。
