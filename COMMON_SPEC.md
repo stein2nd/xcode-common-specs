@@ -31,6 +31,10 @@
 - クラスより struct / enum を優先します。
 - 依存注入は、プロトコルベースとします。
 
+## デザイン規約
+- macOS ネイティブなデザイン ([macOS Human Interface Guidelines](https://developer.apple.com/jp/design/human-interface-guidelines/)) に準拠します。
+- タイトル・テキストは San Francisco フォントを使用します。
+
 ## テスト方針
 - XCTest によるユニットテストを必須にしてください。
 - UI コンポーネントは SnapshotTesting を実施してください。
