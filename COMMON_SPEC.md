@@ -77,7 +77,7 @@
 ### 2. プロジェクト設定
 
 | 項目 | 推奨値 | 理由 |
-|------|--------|------|
+|--|--|--|
 | Product Name |  | `SPEC.md` のプロダクト名と一致 |
 | Team | Apple ID に応じて設定 | コード署名のため |
 | Organization Identifier | `com.s2j` | ドメイン逆引き規則、一貫性確保 |
@@ -136,7 +136,28 @@
 
 * Git 管理下に含めるべきファイル・含めないファイルを明確にし、環境依存やビルド成果物を排除することで、再現性の高い開発環境を維持します。
 
-### 1. Git 管理に含めるべきファイル
+### 1. 運用ルール
+
+* `.gitignore` は **リポジトリルートに設置**し、全員が共通利用します。
+* `Package.resolved` のコミット有無は、チーム方針に従ってください。
+* 秘密情報 (API キーなど) を含む `.env` 系ファイルは必ず ignore してください。
+* Xcode のユーザー個別設定 (`xcuserdata`) はコミットしないでください。
+* 新規依存管理ツール導入時は `.gitignore` を更新し、Appendix B に追記してください。
+
+### 2. 管理対象ファイル／除外対象ファイル
+
+| ディレクトリ／ファイル | 管理対象 | 備考 |
+|--|--|--|
+| `xcshareddata` | ✅ | チーム共有設定 (例: scheme, WorkspaceSettings) |
+| `xcuserdata` | ❌ | 個々人の環境依存データ (breakpoints、user-specific settings 等) |
+| `*.xcworkspace/contents.xcworkspacedata` | ✅ | ワークスペース構成情報 |
+| `*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings` | ✅ | 共有ワークスペース設定 |
+| `build/`、`DerivedData/`、`*.xcarchive` 等 | ❌ | ビルド生成物・成果物 |
+| `.DS_Store`, `*.log`, `*.swp` など | ❌ | OS やエディタ由来の一時ファイル |
+| `Pods/`, `Carthage/Build/` (使用する場合) | ❌ | 外部依存のビルド成果物 |
+| `.build/`, `Packages/` 等 | ❌ | SwiftPM のビルドキャッシュ等 |
+
+#### 1. Git 管理に含めるべきファイル
 
 * プロジェクトファイル: `*.xcodeproj`, `*.xcworkspace`
 * 設定ファイル: `Info.plist`, `SPEC.md`
@@ -144,9 +165,9 @@
 * ソースコード: `*.swift` など
 * 必要に応じて `Package.resolved` (依存バージョン固定を優先する場合)
 
-### 2. Git 管理から除外すべきファイル・フォルダ
+#### 2. Git 管理から除外すべきファイル・フォルダ
 
-#### macOS 系
+##### macOS 系
 
 ```gitignore
 .DS_Store
@@ -154,7 +175,7 @@
 .LSOverride
 ```
 
-#### Xcode
+##### Xcode
 
 ```gitignore
 build/
@@ -164,15 +185,16 @@ DerivedData/
 *.xcscmblueprint
 ```
 
-#### Swift Package Manager
+##### Swift Package Manager
 
 ```gitignore
 /.build
 /Packages
-Package.resolved
+# 依存固定を許可するなら次を除外しない
+# /Package.resolved
 ```
 
-#### CocoaPods (利用する場合のみ)
+##### CocoaPods (利用する場合のみ)
 
 ```gitignore
 Pods/
@@ -180,13 +202,13 @@ Pods/
 !.gitignore
 ```
 
-#### Carthage (利用する場合のみ)
+##### Carthage (利用する場合のみ)
 
 ```gitignore
 Carthage/Build/
 ```
 
-#### Fastlane
+##### Fastlane
 
 ```gitignore
 fastlane/report.xml
@@ -195,7 +217,7 @@ fastlane/screenshots/**/*.png
 fastlane/test_output
 ```
 
-#### アーカイブ / IPA
+##### アーカイブ / IPA
 
 ```gitignore
 *.xcarchive
@@ -204,14 +226,14 @@ fastlane/test_output
 *.dSYM
 ```
 
-#### Playground
+##### Playground
 
 ```gitignore
 timeline.xctimeline
 playground.xcworkspace
 ```
 
-#### ログ / 一時ファイル
+##### ログ / 一時ファイル
 
 ```gitignore
 *.log
@@ -220,17 +242,73 @@ playground.xcworkspace
 *.tmp
 ```
 
-#### 環境依存ファイル
+##### 環境依存ファイル
 
 ```gitignore
 *.env
 *.local
 ```
 
-### 3. 運用ルール
+### 3. 既に管理対象になっているファイルを解除する手順
 
-* `.gitignore` は **リポジトリルートに設置**し、全員が共通利用します。
-* `Package.resolved` のコミット有無は、チーム方針に従ってください。
-* 秘密情報 (API キーなど) を含む `.env` 系ファイルは必ず ignore してください。
-* Xcode のユーザー個別設定 (`xcuserdata`) はコミットしないでください。
-* 新規依存管理ツール導入時は `.gitignore` を更新し、Appendix B に追記してください。
+1. ターミナルでリポジトリルートに移動
+2. 以下を実行してキャッシュから除外 (Git の管理対象から外す)
+
+   ```bash
+   git rm --cached -r path/to/除外したいディレクトリ_or_ファイル
+   ```
+3. `.gitignore` を更新 (該当パターンを追加)
+4. コミットしてプッシュ
+
+   ```bash
+   git commit -m "Remove unwanted files from repo and update .gitignore"
+   git push
+   ```
+
+### 4. ブランチ戦略とコミット規約
+
+* **ブランチ戦略**
+
+  * `main` (または `master`): 常に安定／リリース可能な状態
+  * `feature/xxx`: 新機能開発用ブランチ
+  * `fix/xxx`: バグ修正用ブランチ
+  * Pull Request → レビュー ＋ CI 通過後マージ
+
+* **コミットメッセージ規約**
+
+  * `feat: ～` → 機能追加
+  * `fix: ～` → バグ修正
+  * `chore: ～` → ドキュメント更新、設定変更など
+  * `docs: ～` → ドキュメントのみの変更
+
+* **PR／レビュー運用**
+
+  * 少ないファイル差分で提出
+  * レビュー承認前に CI が通ること
+  * （オプション）マージ前に rebase／squash を行う
+
+---
+
+### 5. CI／テストとの連携ルール
+
+* `.github/workflows` などの CI 設定ファイルは Git 管理対象
+* テストスイートが通ることをマージ条件とする
+* ビルドキャッシュや生成物は Git 管理しない
+
+---
+
+## FAQ: 削除ファイルの扱い
+
+### Q1. ローカルで削除したが、まだコミットしていない場合に「Hunk を戻す」を押すと？
+
+* 削除が取り消され、ファイルは直前の Git 管理下の内容で復活する。
+
+### Q2. ローカルで削除をコミット済みの場合に「Hunk を戻す」を押すと？
+
+* 既に履歴に削除が残っているため、そのままでは復活しない。復元するには `git restore` や「履歴から復元」を実行する必要がある。
+
+### Q3. リモート (GitHub) 側で削除されたが、ローカルにファイルが残っている場合は？
+
+* **まだ pull していない場合**: ローカルは削除を認識していないため、削除差分自体が表示されない。この場合「Hunk を戻す」対象にならない。
+* **pull 済みで削除差分が反映された場合**: Sourcetree 上で「削除されたファイル」と表示される。ここで「Hunk を戻す」を押すと、削除が取り消されファイルが復活する。
+* **pull 済みでローカルに未コミット変更がある場合**: 「リモート削除 vs ローカル変更」の競合になる。この場合「Hunk を戻す」を押すと、削除が取り消され、ローカル編集を残したままファイルが復活する。
