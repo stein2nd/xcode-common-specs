@@ -110,8 +110,8 @@
 ### 4. 追加推奨設定
 
 #### `Info.plist`
-  * CFBundleName → プロジェクト名
-  * CFBundleShortVersionString / CFBundleVersion → `SPEC.md` の Version 章と同期
+  * `CFBundleName` → プロジェクト名
+  * `CFBundleShortVersionString` / `CFBundleVersion` → `SPEC.md` の Version 章と同期
 
 #### ローカライズ
   * Base, English, Japanese を初期追加
