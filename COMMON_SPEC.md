@@ -1,46 +1,133 @@
 # COMMON_SPEC.md (Common Template for Swift / SwiftUI Projects)
 
 ## 目的
-- 本ドキュメントでは、本リポジトリ配下で開発する Swift/Swift-UI プロジェクトに於いて AI 伴走開発を行う際の共通仕様・ルールを定義します。
+* 本ドキュメントでは、本リポジトリ配下で開発する Swift/Swift-UI プロジェクトに於いて AI 伴走開発を行う際の共通仕様・ルールを定義します。
 
 ## 技術スタック
-- 言語: Swift (最新安定版)
-- UI: SwiftUI (最優先)
-- プロジェクト管理: Xcode (.xcodeproj or SwiftPM)
-- 最低対応OS: iOS 16 / macOS 12
-- 依存管理: [Swift Package Manager (SPM)](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/)
-- テスト: XCTest + SnapshotTesting
+* 言語: Swift (最新安定版)
+* UI: SwiftUI (最優先)
+* プロジェクト管理: Xcode (.xcodeproj or SwiftPM)
+* 最低対応OS: iOS 16 / macOS 12
+* 依存管理: [Swift Package Manager (SPM)](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/)
+* テスト: XCTest + SnapshotTesting
 
 ## 開発ルール
-- Swift Concurrency (async/await, actor) を優先的に使用します。
-- UIKit / AppKit の使用は最小限に抑えてください。
-- モジュール化 (Feature 単位で分割) を推奨します。
-- Assets.xcassets にリソースを統合します。
-- 定数・文字列は Localizable.strings / .stringsdict を利用します。
-- 設計パターン: MVVM を基本とします。
-- 実装修正の着手は、人間が許可してから行なってください。
+* Swift Concurrency (async/await, actor) を優先的に使用します。
+* UIKit / AppKit の使用は最小限に抑えてください。
+* モジュール化 (Feature 単位で分割) を推奨します。
+* Assets.xcassets にリソースを統合します。
+* 定数・文字列は Localizable.strings / .stringsdict を利用します。
+* 設計パターン: MVVM を基本とします。
+* 実装修正の着手は、人間が許可してから行なってください。
+
+## プロジェクト構成
+
+```
+プロジェクト名/
+├── SPEC.md
+├── プロジェクト名.swift
+├── ContentView.swift
+├── Localizable.strings (Base, ja, en, …)
+├── Assets.xcassets
+├── Tests/
+├── UITests/
+└── Preview Content/
+```
 
 ## 国際化・ローカライズ
-- Localizable.strings, Localizable.stringsdict を必ず使用してください。
-- 翻訳キーはコメント付きで管理します。
-- Markdown 対応コメントを推奨します。
+* `Localizable.strings`, `Localizable.stringsdict` を必ず使用してください。
+  * ⚠️ Xcode 26.0 以降では **Strings Catalog (.xcstrings)** が推奨。→ 可能であれば `Localizable.xcstrings` を利用し、翻訳管理を効率化。
+* 翻訳キーはコメント付きで管理します。
+* Markdown 対応コメントを推奨します。
 
 ## コーディング規約
-- [SwiftFormat](https://formulae.brew.sh/formula/swiftformat#default) でソースコードを自動整形し、[SwiftLint](https://formulae.brew.sh/formula/swiftlint) でソースコードを検査してください。
-- 1ファイル1型を原則とします。
-- クラスより struct / enum を優先します。
-- 依存注入は、プロトコルベースとします。
+* [SwiftFormat](https://formulae.brew.sh/formula/swiftformat#default) でソースコードを自動整形してください。
+* [SwiftLint](https://formulae.brew.sh/formula/swiftlint) でソースコードを検査してください。
+* 1ファイル1型を原則とします。
+* クラスより struct / enum を優先します。
+* 依存注入は、プロトコルベースとします。
 
 ## デザイン規約
-- macOS ネイティブなデザイン ([macOS Human Interface Guidelines](https://developer.apple.com/jp/design/human-interface-guidelines/)) に準拠します。
-- タイトル・テキストは San Francisco フォントを使用します。
+* macOS ネイティブなデザイン ([macOS Human Interface Guidelines](https://developer.apple.com/jp/design/human-interface-guidelines/)) に準拠します。
+* タイトル・テキストは San Francisco フォントを使用します。
 
 ## テスト方針
-- XCTest によるユニットテストを必須にしてください。
-- UI コンポーネントは SnapshotTesting を実施してください。
-- カバレッジ 70%以上を目標とします。
-- [Swift Testing](https://developer.apple.com/documentation/testing) を参照してください。
+* [Swift Testing](https://developer.apple.com/documentation/testing) を参照してください。
+* XCTest によるユニットテストを必須にしてください。
+* UI コンポーネントは SnapshotTesting を実施してください。
+* カバレッジ目標は 70% 以上とします。
 
 ## ドキュメント
-- 各プロジェクトの個別仕様は、各リポジトリ内の `SPEC.md` に記載します。
-- 各プロジェクトでは、必要に応じて派生 SPEC.md を追加することがあります。
+* 各プロジェクトの個別仕様は、各リポジトリ内の `SPEC.md` に記載します。
+* 各プロジェクトでは、必要に応じて派生 `SPEC.md` を追加することがあります。
+
+## Appendix A: Xcode プロジェクト作成ウィザード推奨選択肢リスト
+
+* AI 伴走開発を前提とする各プロジェクトでの、Xcode における新規プロジェクト作成時の推奨選択肢を以下にまとめます。
+* 本リストは Xcode 26.0.1 におけるウィザード構成・オプションに準拠します。
+
+### 1. テンプレート選択
+
+* **Platform**: macOS
+  * ⚠️ `SPEC.md` に基づいて選択してください。
+
+* **Template**: App
+  * ⚠️ Xcode 26.0 以降では「Multiplatform」や「Document App」も選択肢として提示されるが、**macOS 専用** プロジェクトでは「App」を選択してください。
+
+### 2. プロジェクト設定
+
+| 項目 | 推奨値 | 理由 |
+|------|--------|------|
+| Product Name |  | `SPEC.md` のプロダクト名と一致 |
+| Team | Apple ID に応じて設定 | コード署名のため |
+| Organization Identifier | `com.s2j` | ドメイン逆引き規則、一貫性確保 |
+| Interface | SwiftUI | SwiftUI ベースを前提 |
+| Language | Swift (Swift 7.0) | Xcode 26.0.1 に同梱される Swift バージョン (Objective-C は不要) |
+| Use Core Data |  | `SPEC.md` に基づく |
+| Include Tests | On | `SPEC.md` に基づきテストを考慮 |
+| Include CloudKit |  | `SPEC.md` に基づく |
+| Include Document Group |  | `SPEC.md` に基づく |
+| Source Control | On (Git) | `SPEC.md` / GitHub 運用をリンクさせるため |
+
+### 3. プロジェクト作成後の初期調整
+
+* **Navigator に SPEC.md を追加**
+  * Finder から `SPEC.md` をプロジェクトルートへ配置
+  * Xcode の **Project Navigator** にドラッグ & ドロップ
+  * 「Add to targets」は **チェックなし** (ビルド不要)
+
+  * 後からの確認手順
+
+    * [ ] `SPEC.md` を選択し、右ペイン **File Inspector** を開く (`⌥⌘1`)
+    * [ ] 「Target Membership」がすべて **未チェック** であることを確認
+
+  * 誤ってチェックが入っていた場合の解除手順
+
+    * [ ] **File Inspector → Target Membership** で対象ターゲットのチェックを外す
+    * [ ] メニューから **Product > Clean Build Folder…** (`⇧⌘K`) を実行
+    * [ ] 再ビルドし、`SPEC.md` がビルドに含まれないことを確認
+
+### 4. 追加推奨設定
+
+#### `Info.plist`
+  * CFBundleName → プロジェクト名
+  * CFBundleShortVersionString / CFBundleVersion → `SPEC.md` の Version 章と同期
+
+#### ローカライズ
+  * Base, English, Japanese を初期追加
+
+#### エディタ設定
+  * Text Editing → Show Line Numbers: On
+  * Editor → Syntax Coloring: Swift / Markdown を有効化
+  * Indentation → Spaces: 4 (プロジェクト標準に従う)
+
+#### **ビルド設定**
+  * Deployment Target: macOS 16.0 以上
+  * Swift Concurrency チェック: Strict に設定
+  * Dead Code Stripping: 有効化
+
+### 5. 補足 (Xcode 26 特有の推奨事項)
+
+* **Preview on device** を積極活用 (SwiftUI Preview + 実機同期)
+* **SwiftData / Observable** 等の新 API 利用時は、Appendix に仕様を追記
+* **Package Dependencies** は SwiftPM を利用し、外部ライブラリを導入する場合は `SPEC.md` に明記
