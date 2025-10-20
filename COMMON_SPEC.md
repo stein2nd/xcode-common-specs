@@ -389,6 +389,144 @@ playground.xcworkspace
 
 ---
 
+# **Appendix D: AI 伴走開発ルール**
+
+## 概要
+
+本 Appendix は、Xcode 共通仕様 (COMMON_SPEC) に準拠したプロジェクトにおいて、AI 支援ツール (例: **Cursor**、**Xcode AI Chat**、**GitHub Copilot**、**ChatGPT**) を併用する際の基本方針および運用ルールを定義します。
+
+目的は、**AI 生成物の品質と仕様準拠を維持しつつ、開発効率を最大化すること** です。
+
+---
+
+## 1. 開発フェーズ別の役割分担
+
+| フェーズ | 推奨 AI ツール | 主な役割 | 備考 |
+| --- | --- | --- | --- |
+| 設計・雛形生成 | **Cursor** / ChatGPT | SPEC.md・COMMON_SPEC の読解、Swift Package 構造の生成 | 長文仕様理解に適する |
+| 実装・検証 | **Xcode (AI Chat)** | SwiftUI コード補完、ビルドエラー修正、UI 微調整 | Swift 実行環境と統合 |
+| 品質保証・レビュー | **Docs Linter** / SwiftLint / SwiftFormat | コード整形・表記揺れ・Lint 検査 | CI 統合を推奨 |
+
+---
+
+## 2. AI 支援開発の基本原則
+
+1. **AI は設計の補助者であり、仕様の代替ではない。**
+   常に SPEC.md および COMMON_SPEC を一次資料とする。
+2. **AI 出力物はすべて Git 管理対象とし、生成物のトレーサビリティを確保する。**
+   → AI による改変履歴も Pull Request としてレビューする。
+3. **仕様の曖昧さを AI に解釈させない。**
+   → 必ず「仕様ではこう書かれているが、どちらが適切か？」の質問形式で指示する。
+4. **プラットフォーム差異を AI に自動判断させない。**
+   → macOS / iPadOS のいずれかを明示し、`#if canImport(AppKit)` / `#if canImport(UIKit)` を常に確認する。
+5. **機密・認証情報 (API キー等) を AI に含めない。**
+
+---
+
+## 3. AI ツール間の連携フロー (ハイブリッド開発)
+
+### 標準ワークフロー
+
+```
+Cursor: 設計・雛形生成
+↓
+Git Commit (ai-dev/cursor ブランチ)
+↓
+Xcode: 実装・ビルド・テスト
+↓
+Git Commit (ai-dev/xcode ブランチ)
+↓
+CI: Docs Linter + SwiftLint + Snapshot Testing
+↓
+Release
+```
+
+| 手順 | 内容 | 留意点 |
+| --- | --- | --- |
+| ① | Cursor に SPEC.md 全体を読み込ませ、Swift Package 雛形を生成 | 「macOS/iPadOS 両対応」と明示 |
+| ② | 生成後に `git commit` し、バージョンを固定 | 構成誤差を防ぐ |
+| ③ | Xcode で開き、AI チャットに SPEC 抜粋を渡してチューニング | コンテキスト上限に注意 |
+| ④ | Docs Linter と SwiftLint を併用 | 出力差を自動整形 |
+| ⑤ | PR 時に AI 生成差分を明示 | レビュー担当者が仕様逸脱を確認可能 |
+
+---
+
+## 4. AI との効果的な対話スタイル
+
+| 状況 | 望ましい指示文 | 理由 |
+| --- | --- | --- |
+| コード生成依頼時 | 「`AboutView.swift` に MarkdownView を統合して」 | ファイル単位で明示的に指示 |
+| 仕様判断が必要な時 | 「SPEC.md ではこうだが、SwiftUI 側ではどう扱うべき？」 | 誤解防止・仕様遵守確認 |
+| テスト修正時 | 「`S2JAboutWindowTests` に SnapshotTesting を追加して」 | 構造理解を促す |
+| macOS/iPadOS 切替時 | 「macOS では NSWindow を使い、iPad では .sheet を使う前提」 | 平行定義を防ぐ |
+
+---
+
+## 5. 品質保証と CI 連携
+
+### 5.1 自動検査ツール
+
+| ツール | 検査対象 | 実行タイミング |
+| --- | --- | --- |
+| Docs Linter | ドキュメントの表記揺れ・文体統一 | PR 時 |
+| SwiftLint / SwiftFormat | Swift コード規約 | コミット時または CI |
+| SnapshotTesting | SwiftUI ビューの UI 再現性 | テスト実行時 |
+
+### 5.2 推奨 GitHub Actions
+
+```yaml
+# .github/workflows/ai-ci.yml
+name: AI CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cd tools/docs-linter && npm ci && npm run lint
+      - run: swift test --enable-code-coverage
+```
+
+---
+
+## 6. 注意事項 (セキュリティ・倫理)
+
+* AI が参照する文書には、ライセンス上の制限を確認すること。
+* OSS コードを AI 出力に取り込む際は、元のライセンス表記を保持する。
+* AI モデルが外部サーバーにデータ送信を行う場合、内部コードを含めない。
+
+---
+
+## 7. 推奨運用ルール (プロジェクト横断)
+
+| 項目 | 内容 |
+| --- | --- |
+| **命名規則** | AI 生成コードも COMMON_SPEC の命名基準に従う (`S2J` プレフィックス等) |
+| **Backlog 更新** | AI による仕様変更提案は SPEC.md の Backlog に反映 |
+| **学習資料** | AI に参照させる文書は `/docs/` 配下に統一配置 |
+| **レビュー** | AI 生成物は常に人間レビューを通過してマージ |
+
+---
+
+## 8. まとめ
+
+AI 伴走開発は、**「AI に設計を任せる」のではなく、「AI に仕様遵守を監督させる」** ことで真価を発揮します。
+Cursor と Xcode AI を組み合わせることで、
+
+* 設計段階での仕様整合
+* 実装段階での動作品質
+
+を同時に確保できます。
+
+この Appendix は、AI 支援を標準開発プロセスに組み込むための指針として利用してください。
+
+---
+
 ## FAQ: 削除ファイルの扱い
 
 ### Q1. ローカルで削除したが、まだコミットしていない場合に「Hunk を戻す」を押すと？
