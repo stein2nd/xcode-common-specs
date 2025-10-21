@@ -24,12 +24,27 @@
 
 ```
 プロジェクト名/
-├── SPEC.md
+├┬─ docs/  # ドキュメント類
+│└─ `SPEC.md`
+├┬─ tools/
+│└┬─ docs-linter  # Git サブモジュール『Docs Linter』
+│　└┬─ dist/
+│　　└─ `run-textlint.js`
+├┬─ .github/
+│└┬─ workflows/
+│　└─ docs-linter.yml
+├── LICENSE
+├── README.md
+├── アプリのエントリーポイント.swift
 ├── プロジェクト名.swift
-├── ContentView.swift
-├── Localizable.strings (Base, ja, en, …)
-├── Assets.xcassets
-├── Tests/
+├┬─ Sources/
+│└┬─ プロジェクト名/
+│　└┬─ Resources/
+│　　├─ Images.xcassets
+│　　├─ `Assets.xcassets`
+│　　└─ Localizable.strings  // (Base、ja、en、…)
+├┬─ Tests/
+│└── プロジェクト名Tests/
 ├── UITests/
 └── Preview Content/
 ```
