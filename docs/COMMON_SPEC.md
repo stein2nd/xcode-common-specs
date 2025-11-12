@@ -1,13 +1,13 @@
 # COMMON_SPEC.md (Common Template for Swift / SwiftUI Projects)
 
 ## 目的
-* 本ドキュメントでは、本リポジトリ配下で開発する Swift/Swift-UI プロジェクトに於いて AI 伴走開発を行う際の共通仕様・ルールを定義します。
+* 本ドキュメントでは、本リポジトリ配下で開発する Swift/Swift-UI プロジェクトにおいて「AI 伴走開発」を行う際の共通仕様・ルールを定義します。
 
 ## 技術スタック
 * 言語: Swift (最新安定版)
 * UI: SwiftUI (最優先)
 * プロジェクト管理: Xcode (.xcodeproj or SwiftPM)
-* 最低対応OS: iOS 16 / macOS 12
+* 最低対応 OS: iOS v16 / macOS v12
 * 依存管理: [Swift Package Manager (SPM)](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/)
 * テスト: XCTest + SnapshotTesting
 
@@ -18,7 +18,7 @@
 * Assets.xcassets にリソースを統合します。
 * 定数・文字列は Localizable.strings / .stringsdict を利用します。
 * 設計パターン: MVVM を基本とします。
-* 実装修正の着手は、人間が許可してから行なってください。
+* 実装修正の着手は、人間が許可してから実行してください。
 
 ## プロジェクト構成
 
@@ -51,7 +51,7 @@
 
 ## 国際化・ローカライズ
 * `Localizable.strings`, `Localizable.stringsdict` を必ず使用してください。
-  * ⚠️ Xcode 26.0 以降では **Strings Catalog (.xcstrings)** が推奨。→ 可能であれば `Localizable.xcstrings` を利用し、翻訳管理を効率化。
+  * ⚠️ Xcode v26.0以降では **Strings Catalog (.xcstrings)** が推奨。→ 可能であれば `Localizable.xcstrings` を利用し、翻訳管理を効率化。
 * 翻訳キーはコメント付きで管理します。
 * Markdown 対応コメントを推奨します。
 
@@ -70,7 +70,7 @@
 * [Swift Testing](https://developer.apple.com/documentation/testing) を参照してください。
 * XCTest によるユニットテストを必須にしてください。
 * UI コンポーネントは SnapshotTesting を実施してください。
-* カバレッジ目標は 70% 以上とします。
+* カバレッジ目標は70%以上とします。
 
 ## ドキュメント
 * 各プロジェクトの個別仕様は、各リポジトリ内の `SPEC.md` に記載します。
@@ -81,15 +81,15 @@
 ## Appendix A: Xcode プロジェクト作成ウィザード推奨選択肢リスト
 
 * AI 伴走開発を前提とする各プロジェクトでの、Xcode における新規プロジェクト作成時の推奨選択肢を以下にまとめます。
-* 本リストは Xcode 26.0.1 におけるウィザード構成・オプションに準拠します。
+* 本リストは Xcode v26.0.1におけるウィザード構成・オプションに準拠します。
 
 ### 1. テンプレート選択
 
 * **Platform**: macOS
-  * ⚠️ `SPEC.md` に基づいて選択してください。
+  * ⚠️ `SPEC.md` にもとづいて選択してください。
 
 * **Template**: App
-  * ⚠️ Xcode 26.0 以降では「Multiplatform」や「Document App」も選択肢として提示されるが、**macOS 専用** プロジェクトでは「App」を選択してください。
+  * ⚠️ Xcode v26.0以降では「Multiplatform」や「Document App」も選択肢として提示されるが、**macOS 専用** プロジェクトでは「App」を選択してください。
 
 ### 2. プロジェクト設定
 
@@ -99,11 +99,11 @@
 | Team | Apple ID に応じて設定 | コード署名のため |
 | Organization Identifier | `com.s2j` | ドメイン逆引き規則、一貫性確保 |
 | Interface | SwiftUI | SwiftUI ベースを前提 |
-| Language | Swift (Swift 7.0) | Xcode 26.0.1 に同梱される Swift バージョン (Objective-C は不要) |
-| Use Core Data |  | `SPEC.md` に基づく |
-| Include Tests | On | `SPEC.md` に基づきテストを考慮 |
-| Include CloudKit |  | `SPEC.md` に基づく |
-| Include Document Group |  | `SPEC.md` に基づく |
+| Language | Swift (Swift v7.0) | Xcode v26.0.1に同梱される Swift バージョン (Objective-C は不要) |
+| Use Core Data |  | `SPEC.md` にもとづく |
+| Include Tests | On | `SPEC.md` にもとづきテストを考慮 |
+| Include CloudKit |  | `SPEC.md` にもとづく |
+| Include Document Group |  | `SPEC.md` にもとづく |
 | Source Control | On (Git) | `SPEC.md` / GitHub 運用をリンクさせるため |
 
 ### 3. プロジェクト作成後の初期調整
@@ -124,7 +124,7 @@
     * [ ] メニューから **Product > Clean Build Folder…** (`⇧⌘K`) を実行
     * [ ] 再ビルドし、`SPEC.md` がビルドに含まれないことを確認
 
-### 4. 追加推奨設定
+### 4. 追加の推奨設定
 
 #### `Info.plist`
   * `CFBundleName` → プロジェクト名
@@ -133,17 +133,17 @@
 #### ローカライズ
   * Base, English, Japanese を初期追加
 
-#### エディタ設定
+#### エディター設定
   * Text Editing → Show Line Numbers: On
   * Editor → Syntax Coloring: Swift / Markdown を有効化
   * Indentation → Spaces: 4 (プロジェクト標準に従う)
 
 #### **ビルド設定**
-  * Deployment Target: macOS 16.0 以上
-  * Swift Concurrency チェック: Strict に設定
+  * Deployment Target: macOS v16.0以上
+  * Swift Concurrency チェック: `Strict` に設定
   * Dead Code Stripping: 有効化
 
-### 5. 補足 (Xcode 26 特有の推奨事項)
+### 5. 補足 (Xcode v26特有の推奨事項)
 
 * **Preview on device** を積極活用 (SwiftUI Preview + 実機同期)
 * **SwiftData / Observable** 等の新 API 利用時は、Appendix に仕様を追記
@@ -153,7 +153,7 @@
 
 ## Appendix B: Spec Driven Developing Rule (AI-伴走開発ガイドライン)
 
-* この付録は、Xcode 26 における AI 伴走型開発 (例：ChatGPT in Xcode、Claude in Xcode) を **SPEC 準拠** で進めるための運用ルール群を定めるものです。
+* この付録は、Xcode v26における「AI 伴走型開発」(例: ChatGPT in Xcode、Claude in Xcode) を **SPEC 準拠** で進めるための運用ルール群を定めるものです。
 * 本ガイドラインは必須ではなく、「SPEC を唯一の正典としつつ AI を活用する開発スタイル」を推進するための補助ルールと考えてください。
 
 ### 1. 用語定義
@@ -162,7 +162,7 @@
 |---|---|
 | SPEC | `COMMON_SPEC.md` をはじめとする、開発仕様・要件を定めた文書群 |
 | `CLAUDE.md` | 設計思想、コーディング規範、レビュー方針などを体系化した補助仕様書 |
-| AIモデル | ChatGPT in Xcode や Claude in Xcode などの、コード生成／レビュー支援に使う AI モジュール |
+| AI モデル | ChatGPT in Xcode や Claude in Xcode などの、コード生成/レビュー支援に使う AI モジュール |
 | Prompt | AI に投げる指示文。AI をどう動かすかを制御するためのテキスト |
 
 ### 2. 基本原則
@@ -172,25 +172,24 @@
   * すべての実装判断、動作仕様、入出力仕様はまず SPEC に記述されていることを前提とします。
   * AI による生成物が SPEC と整合しない場合、SPEC 側を優先し、AI に修正を指示します。
 
-2. **補助仕様 (CLAUDE.md 等) は設計規範／レビュー軸として用いる**
+2. **補助仕様 (CLAUDE.md 等) は設計規範/レビュー軸として用いる**
 
   * プロジェクト固有の設計思想、命名規則、責務分割ルールなどを `CLAUDE.md` に定義しておいてください。  
-  * AI に対して“CLAUDE.md に従って実装してください”という旨を常にプロンプトに含めてください。
+  * AI に対して「CLAUDE.md に従って実装してください」という旨を、常にプロンプトに含めてください。
 
 3. **Prompt 運用ルールを定義・共有する**
 
-  * 各機能あるいはモジュール単位で、標準プロンプト定型テンプレート (雛形) をチームで決めておいてください。
-  * Prompt に「参照すべき SPEC のセクション」「設計規範を指定するファイル名 (例：CLAUDE.md)」「禁止事項・注意事項」などを明示してください。
+  * 各機能あるいはモジュール単位で、標準プロンプト定型テンプレート (ひな型) をチームで決めておいてください。
+  * Prompt に「参照すべき SPEC のセクション」「設計規範を指定するファイル名 (例: CLAUDE.md)」「禁止事項・注意事項」などを明示してください。
 
-4. **AI 出力の自律チェック／レビューを欠かさない**
+4. **AI 出力の自律チェック/レビューを欠かさない**
 
-  * AI が生成したコード／ドキュメントは必ず人がレビューし、SPEC 準拠かをチェックしてください。
-  * レビュー時には以下観点を最低限確認してください：
-
+  * AI が生成したコード/ドキュメントは必ず人がレビューし、SPEC 準拠かをチェックしてください。
+  * レビュー時には以下観点を最低限確認してください。
     * a) 入出力仕様が合っているか
     * b) 例外処理やエッジケース対応が抜けていないか
     * c) 命名規則・責務分割・モジュール境界が設計方針 (CLAUDE.md) に準じているか
-    * d) セキュリティ／パフォーマンス上の懸念点がないか
+    * d) セキュリティ/パフォーマンス上の懸念点がないか
 
 5. **AI 生成と手動修正の境界を設ける**
 
@@ -200,20 +199,20 @@
 6. **継続的な Prompt チューニングと振り返り**
 
   * AI に出力させたコード品質を定期的に振り返り、プロンプト改善案をチームで共有してください。
-  * Prompt による逸脱や誤生成が続く場合、SPEC や CLAUDE.md の記述を再精査し、曖昧性を排除してください。
+  * Prompt による逸脱や誤生成が続く場合、SPEC や CLAUDE.md の記述を再精査し、あいまい性を排除してください。
 
 ### 3. ChatGPT in Xcode 用運用補足
 
-* プロンプトの明示形式例：
+* プロンプトの明示形式例:
 
   > 「COMMON_SPEC.md の §4.2 入出力仕様に従って、この関数 `fetchUserProfile` を Swift で実装してください。命名規則・例外処理は CLAUDE.md に従ってください。」
 
-* ChatGPT は補完的な提案をしやすいため、必要な前提をすべてプロンプトに盛り込んでください (例：非同期モデル、エラー伝播方針、戻り値型など)。
+* ChatGPT は補完的な提案をしやすいため、必要な前提をすべてプロンプトに盛り込んでください (例: 非同期モデル、エラー伝播方針、戻り値型など)。
 * 生成されたコードの **差分レビュー** を重視してください。AI が不要な冗長コードや過剰最適化を出すこともあるため、人による簡潔化判断を入れてください。
 
 ### 4. Claude in Xcode 用運用補足
 
-* Claude に対しては「設計・レビューモード」での使用が有効です。プロンプト例：
+* Claude に対しては「設計・レビューモード」での使用が有効です。プロンプト例:
 
   > 「COMMON_SPEC.md と CLAUDE.md に準拠して、このモジュール全体の設計レビューを行ってください。命名不整合、責務オーバーラップ、拡張性／保守性観点での改善案を示してください。」
 
@@ -228,7 +227,7 @@
 2. AI (ChatGPT) に対してプロンプトを投げ、初期コード生成
 3. 人がレビュー (SPEC 準拠性／設計妥当性チェック)
 4. Claude で設計観点レビュー or 整合性チェック
-5. 必要あれば SPEC／CLAUDE.md を修正
+5. 必要あれば SPEC/CLAUDE.md を修正
 6. ChatGPT に修正プロンプトを送り再出力 → 最終レビュー → マージ
 
 ### 6. 注意・制限事項
@@ -249,18 +248,18 @@
 * `Package.resolved` のコミット有無は、チーム方針に従ってください。
 * 秘密情報 (API キーなど) を含む `.env` 系ファイルは必ず ignore してください。
 * Xcode のユーザー個別設定 (`xcuserdata`) はコミットしないでください。
-* 新規依存管理ツール導入時は `.gitignore` を更新し、Appendix B に追記してください。
+* 依存管理ツールの新規導入時は `.gitignore` を更新し、Appendix B に追記してください。
 
 ### 2. 管理対象ファイル／除外対象ファイル
 
 | ディレクトリ／ファイル | 管理対象 | 備考 |
 |--|--|--|
-| `xcshareddata` | ✅ | チーム共有設定 (例: scheme, WorkspaceSettings) |
+| `xcshareddata` | ✅ | チーム共有設定 (例: Scheme, WorkspaceSettings) |
 | `xcuserdata` | ❌ | 個々人の環境依存データ (breakpoints、user-specific settings 等) |
 | `*.xcworkspace/contents.xcworkspacedata` | ✅ | ワークスペース構成情報 |
 | `*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings` | ✅ | 共有ワークスペース設定 |
 | `build/`、`DerivedData/`、`*.xcarchive` 等 | ❌ | ビルド生成物・成果物 |
-| `.DS_Store`, `*.log`, `*.swp` など | ❌ | OS やエディタ由来の一時ファイル |
+| `.DS_Store`, `*.log`, `*.swp` など | ❌ | OS やエディター由来の一時ファイル |
 | `Pods/`, `Carthage/Build/` (使用する場合) | ❌ | 外部依存のビルド成果物 |
 | `.build/`, `Packages/` 等 | ❌ | SwiftPM のビルドキャッシュ等 |
 
@@ -272,7 +271,7 @@
 * ソースコード: `*.swift` など
 * 必要に応じて `Package.resolved` (依存バージョン固定を優先する場合)
 
-#### 2. Git 管理から除外すべきファイル・フォルダ
+#### 2. Git 管理から除外すべきファイル・フォルダー
 
 ##### macOS 系
 
@@ -356,9 +355,9 @@ playground.xcworkspace
 *.local
 ```
 
-### 3. 既に管理対象になっているファイルを解除する手順
+### 3. すでに管理対象になっているファイルを解除する手順
 
-1. ターミナルでリポジトリルートに移動
+1. ターミナルでリポジトリ・ルートに移動
 2. 以下を実行してキャッシュから除外 (Git の管理対象から外す)
 
    ```bash
@@ -377,9 +376,9 @@ playground.xcworkspace
 * **ブランチ戦略**
 
   * `main` (または `master`): 常に安定／リリース可能な状態
-  * `feature/xxx`: 新機能開発用ブランチ
+  * `feature/xxx`: 新機能の開発用ブランチ
   * `fix/xxx`: バグ修正用ブランチ
-  * Pull Request → レビュー ＋ CI 通過後マージ
+  * Pull Request → レビュー + CI 通過後マージ
 
 * **コミットメッセージ規約**
 
@@ -388,15 +387,15 @@ playground.xcworkspace
   * `chore: ～` → ドキュメント更新、設定変更など
   * `docs: ～` → ドキュメントのみの変更
 
-* **PR／レビュー運用**
+* **PR / レビュー運用**
 
   * 少ないファイル差分で提出
   * レビュー承認前に CI が通ること
-  * （オプション）マージ前に rebase／squash を行う
+  * (オプション) マージ前に rebase/squash を行う
 
 ---
 
-### 5. CI／テストとの連携ルール
+### 5. CI / テストとの連携ルール
 
 * `.github/workflows` などの CI 設定ファイルは Git 管理対象
 * テストスイートが通ることをマージ条件とする
@@ -418,22 +417,22 @@ playground.xcworkspace
 
 | フェーズ | 推奨 AI ツール | 主な役割 | 備考 |
 | --- | --- | --- | --- |
-| 設計・雛形生成 | **Cursor** / ChatGPT | SPEC.md・COMMON_SPEC の読解、Swift Package 構造の生成 | 長文仕様理解に適する |
+| 設計・ひな型生成 | **Cursor** / ChatGPT | SPEC.md/COMMON_SPEC の読解、Swift Package 構造の生成 | 長文仕様の理解に適する |
 | 実装・検証 | **Xcode (AI Chat)** | SwiftUI コード補完、ビルドエラー修正、UI 微調整 | Swift 実行環境と統合 |
-| 品質保証・レビュー | **Docs Linter** / SwiftLint / SwiftFormat | コード整形・表記揺れ・Lint 検査 | CI 統合を推奨 |
+| 品質保証・レビュー | **Docs Linter** / SwiftLint / SwiftFormat | コード整形、表記揺れ、Lint 検査 | CI 統合を推奨 |
 
 ---
 
 ## 2. AI 支援開発の基本原則
 
 1. **AI は設計の補助者であり、仕様の代替ではない。**
-   常に SPEC.md および COMMON_SPEC を一次資料とする。
+  * 常に SPEC.md および COMMON_SPEC を一次資料とする。
 2. **AI 出力物はすべて Git 管理対象とし、生成物のトレーサビリティを確保する。**
-   → AI による改変履歴も Pull Request としてレビューする。
-3. **仕様の曖昧さを AI に解釈させない。**
-   → 必ず「仕様ではこう書かれているが、どちらが適切か？」の質問形式で指示する。
+  * AI による改変履歴も Pull Request としてレビューする。
+3. **仕様のあいまいさを AI に解釈させない。**
+  * 必ず「仕様ではこう書かれているが、どちらが適切か ?」の質問形式で指示する。
 4. **プラットフォーム差異を AI に自動判断させない。**
-   → macOS / iPadOS のいずれかを明示し、`#if canImport(AppKit)` / `#if canImport(UIKit)` を常に確認する。
+  * macOS / iPadOS のいずれかを明示し、`#if canImport(AppKit)` / `#if canImport(UIKit)` を常に確認する。
 5. **機密・認証情報 (API キー等) を AI に含めない。**
 
 ---
@@ -458,7 +457,7 @@ Release
 
 | 手順 | 内容 | 留意点 |
 | --- | --- | --- |
-| ① | Cursor に SPEC.md 全体を読み込ませ、Swift Package 雛形を生成 | 「macOS/iPadOS 両対応」と明示 |
+| ① | Cursor に SPEC.md 全体を読み込ませ、Swift Package ひな型を生成 | 「macOS/iPadOS 両対応」と明示 |
 | ② | 生成後に `git commit` し、バージョンを固定 | 構成誤差を防ぐ |
 | ③ | Xcode で開き、AI チャットに SPEC 抜粋を渡してチューニング | コンテキスト上限に注意 |
 | ④ | Docs Linter と SwiftLint を併用 | 出力差を自動整形 |
@@ -471,7 +470,7 @@ Release
 | 状況 | 望ましい指示文 | 理由 |
 | --- | --- | --- |
 | コード生成依頼時 | 「`AboutView.swift` に MarkdownView を統合して」 | ファイル単位で明示的に指示 |
-| 仕様判断が必要な時 | 「SPEC.md ではこうだが、SwiftUI 側ではどう扱うべき？」 | 誤解防止・仕様遵守確認 |
+| 仕様判断が必要なとき | 「SPEC.md ではこうだが、SwiftUI 側ではどう扱うべき ?」 | 誤解防止、仕様遵守の確認 |
 | テスト修正時 | 「`S2JAboutWindowTests` に SnapshotTesting を追加して」 | 構造理解を促す |
 | macOS/iPadOS 切替時 | 「macOS では NSWindow を使い、iPad では .sheet を使う前提」 | 平行定義を防ぐ |
 
@@ -479,7 +478,7 @@ Release
 
 ## 5. 品質保証と CI 連携
 
-### 5.1 自動検査ツール
+### 5.1. 自動検査ツール
 
 | ツール | 検査対象 | 実行タイミング |
 | --- | --- | --- |
@@ -487,7 +486,7 @@ Release
 | SwiftLint / SwiftFormat | Swift コード規約 | コミット時または CI |
 | SnapshotTesting | SwiftUI ビューの UI 再現性 | テスト実行時 |
 
-### 5.2 推奨 GitHub Actions
+### 5.2. 推奨 GitHub Actions
 
 ```yaml
 # .github/workflows/ai-ci.yml
@@ -513,7 +512,7 @@ jobs:
 
 * AI が参照する文書には、ライセンス上の制限を確認すること。
 * OSS コードを AI 出力に取り込む際は、元のライセンス表記を保持する。
-* AI モデルが外部サーバーにデータ送信を行う場合、内部コードを含めない。
+* AI モデルが外部サーバーにデータ送信する場合、内部コードを含めない。
 
 ---
 
@@ -522,7 +521,7 @@ jobs:
 | 項目 | 内容 |
 | --- | --- |
 | **命名規則** | AI 生成コードも COMMON_SPEC の命名基準に従う (`S2J` プレフィックス等) |
-| **Backlog 更新** | AI による仕様変更提案は SPEC.md の Backlog に反映 |
+| **Backlog 更新** | AI による仕様変更の提案は SPEC.md の Backlog に反映 |
 | **学習資料** | AI に参照させる文書は `/docs/` 配下に統一配置 |
 | **レビュー** | AI 生成物は常に人間レビューを通過してマージ |
 
@@ -544,16 +543,19 @@ Cursor と Xcode AI を組み合わせることで、
 
 ## FAQ: 削除ファイルの扱い
 
-### Q1. ローカルで削除したが、まだコミットしていない場合に「Hunk を戻す」を押すと？
+### Q1. ローカルで削除したが、まだコミットしていない場合に「Hunk を戻す」を押すと ?
 
 * 削除が取り消され、ファイルは直前の Git 管理下の内容で復活する。
 
-### Q2. ローカルで削除をコミット済みの場合に「Hunk を戻す」を押すと？
+### Q2. ローカルで削除をコミット済みの場合に「Hunk を戻す」を押すと ?
 
-* 既に履歴に削除が残っているため、そのままでは復活しない。復元するには `git restore` や「履歴から復元」を実行する必要がある。
+* すでに履歴に削除が残っているため、そのままでは復活しない。復元するには `git restore` や「履歴から復元」を実行する必要がある。
 
-### Q3. リモート (GitHub) 側で削除されたが、ローカルにファイルが残っている場合は？
+### Q3. リモート (GitHub) 側で削除されたが、ローカルにファイルが残っている場合は ?
 
-* **まだ pull していない場合**: ローカルの Git クライアントは削除を認識していないため、削除差分自体が表示されない。この場合「Hunk を戻す」対象にならない。
-* **pull 済みで削除差分が反映された場合**: ローカルの Git クライアント上で「削除されたファイル」と表示される。ここで「Hunk を戻す」を押すと、削除が取り消されファイルが復活する。
-* **pull 済みでローカルに未コミット変更がある場合**: 「リモート削除 vs ローカル変更」の競合になる。この場合「Hunk を戻す」を押すと、削除が取り消され、ローカル編集を残したままファイルが復活する。
+* **まだ pull していない場合**:
+  * ローカルの Git クライアントは削除を認識していないため、削除の差分自体が表示されない。この場合「Hunk を戻す」対象にならない。
+* **pull 済みで削除差分が反映された場合**:
+  * ローカルの Git クライアント上で「削除されたファイル」と表示される。ここで「Hunk を戻す」を押すと、削除が取り消されファイルが復活する。
+* **pull 済みでローカルに未コミット変更がある場合**:
+  * 「リモート削除 vs ローカル変更」の競合になる。この場合「Hunk を戻す」を押すと、削除が取り消され、ローカル編集を残したままファイルが復活する。
