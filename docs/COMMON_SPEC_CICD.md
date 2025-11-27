@@ -245,9 +245,71 @@ Xcode バージョン、SDK、シミュレーター・ランタイム、デバ�
     echo "booted_udid=$UDID" >> $GITHUB_OUTPUT
 ```
 
-#### 4.2.7. テスト実行 (マルチ・ストラテジー)
+#### 4.2.7. ランタイム・バージョンの抽出と SDK の自動検出
 
-複数のアプローチでテストを実行し、いずれかが成功すれば CI を継続します。
+シミュレーターのランタイム・バージョンを抽出し、利用可能な SDK を確認して、ランタイム・バージョンと一致する SDK を自動検出します。
+
+```yaml
+- name: Extract runtime version and detect SDK
+  run: |
+    set -euo pipefail
+    UDID="${{ steps.boot.outputs.booted_udid }}"
+
+    # シミュレーターのランタイム情報を取得
+    RUNTIME_SECTION=$(xcrun simctl list devices available | grep -B 50 "$UDID" | grep "^--" | tail -1 | sed 's/^-- //' | sed 's/ --$//' || echo "")
+
+    # ランタイム・バージョンを抽出 (例: "iOS 26.0" -> "26.0")
+    RUNTIME_VERSION=$(echo "$RUNTIME_SECTION" | sed -E 's/.*iOS ([0-9]+\.[0-9]+).*/\1/' || echo "")
+    if [ -z "$RUNTIME_VERSION" ]; then
+      RUNTIME_VERSION=$(echo "$RUNTIME_SECTION" | grep -oE '[0-9]+\.[0-9]+' | head -1 || echo "")
+    fi
+
+    # 利用可能な SDK を確認
+    AVAILABLE_SDKS=$(xcodebuild -showsdks 2>&1 | grep -i "iphonesimulator" || echo "")
+
+    # ランタイム・バージョンと一致する SDK を検出
+    MATCHING_SDK=$(echo "$AVAILABLE_SDKS" | grep -iE "iphonesimulator.*${RUNTIME_VERSION}" | head -1 | sed -E 's/.*-sdk[[:space:]]*(iphonesimulator[0-9.]+).*/\1/' | sed -E 's/.*(iphonesimulator[0-9.]+).*/\1/' || echo "")
+    if [ -z "$MATCHING_SDK" ]; then
+      # メジャー・バージョンで一致する SDK を検索
+      MAJOR_VERSION=$(echo "$RUNTIME_VERSION" | cut -d. -f1)
+      MATCHING_SDK=$(echo "$AVAILABLE_SDKS" | grep -iE "iphonesimulator.*${MAJOR_VERSION}" | head -1 | sed -E 's/.*-sdk[[:space:]]*(iphonesimulator[0-9.]+).*/\1/' | sed -E 's/.*(iphonesimulator[0-9.]+).*/\1/' || echo "")
+    fi
+    if [ -z "$MATCHING_SDK" ]; then
+      # 任意の iphonesimulator SDK を使用
+      MATCHING_SDK=$(echo "$AVAILABLE_SDKS" | head -1 | sed -E 's/.*-sdk[[:space:]]*(iphonesimulator[0-9.]+).*/\1/' | sed -E 's/.*(iphonesimulator[0-9.]+).*/\1/' || echo "")
+    fi
+
+    echo "runtime_version=$RUNTIME_VERSION" >> $GITHUB_ENV
+    echo "matching_sdk=$MATCHING_SDK" >> $GITHUB_ENV
+```
+
+#### 4.2.8. デスティネーションの構築
+
+デスティネーションを構築します。**重要**: OS バージョンを指定せず、UDID のみを使用します。これにより、xcodebuild が自動的に適切な SDK/ランタイムをマッチングし、SDK とランタイムのバージョン不一致の問題を回避します。
+
+```yaml
+- name: Build destination
+  run: |
+    set -euo pipefail
+    UDID="${{ steps.boot.outputs.booted_udid }}"
+
+    # xcodebuild -showdestinations から UDID に一致するデスティネーションを検索
+    DEST_OUTPUT=$(xcodebuild -project <project>.xcodeproj -scheme <scheme> -showdestinations 2>&1 || true)
+    DEST=$(echo "$DEST_OUTPUT" | grep "platform=iOS Simulator" | grep "$UDID" | head -1 | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' || echo "")
+
+    # 見つからない場合は、UDID のみでデスティネーションを構築
+    if [ -z "$DEST" ]; then
+      DEST="platform=iOS Simulator,id=$UDID"
+    fi
+
+    echo "destination=$DEST" >> $GITHUB_ENV
+```
+
+**注意**: OS バージョン (`OS=26.0` など) を指定しないことが重要です。xcodebuild が自動的に適切な SDK/ランタイムをマッチングします。
+
+#### 4.2.9. テスト実行 (マルチ・ストラテジー)
+
+複数のアプローチでテストを実行し、いずれかが成功すれば CI を継続します。**優先順位**: SDK を指定せずに実行を優先し、xcodebuild の自動選択を活用します。
 
 ```yaml
 - name: Build + Run tests (multi-strategy)
@@ -255,13 +317,12 @@ Xcode バージョン、SDK、シミュレーター・ランタイム、デバ�
   run: |
     set -euo pipefail
     UDID="${{ steps.boot.outputs.booted_udid }}"
+    DEST="${{ env.destination }}"
+    MATCHING_SDK="${{ env.matching_sdk }}"
     RESULT_BUNDLE="$LOG_DIR/result.xcresult"
     rm -rf "$RESULT_BUNDLE" || true
 
-    # デスティネーションを決定
-    DEST="platform=iOS Simulator,id=$UDID"
-
-    # ストラテジー A: test-without-building (SDK 指定なし)
+    # ストラテジー A: test-without-building (SDK 指定なし、xcodebuild が自動選択)
     if xcodebuild test-without-building \
       -project <project>.xcodeproj \
       -scheme <scheme> \
@@ -270,22 +331,51 @@ Xcode バージョン、SDK、シミュレーター・ランタイム、デバ�
       -resultBundlePath "$RESULT_BUNDLE" 2>&1; then
       echo "test-without-building succeeded"
     else
-      # ストラテジー B: test (SDK 指定なし)
+      # ストラテジー A-2: test-without-building (検出された SDK を明示的に指定)
       rm -rf "$RESULT_BUNDLE" || true
-      if xcodebuild test \
-        -project <project>.xcodeproj \
-        -scheme <scheme> \
-        -destination "$DEST" \
-        -enableCodeCoverage YES \
-        -resultBundlePath "$RESULT_BUNDLE" 2>&1; then
-        echo "xcodebuild test succeeded"
+      if [ -n "$MATCHING_SDK" ]; then
+        if xcodebuild test-without-building \
+          -project <project>.xcodeproj \
+          -scheme <scheme> \
+          -sdk "$MATCHING_SDK" \
+          -destination "$DEST" \
+          -enableCodeCoverage YES \
+          -resultBundlePath "$RESULT_BUNDLE" 2>&1; then
+          echo "test-without-building succeeded with matching SDK"
+        else
+          # ストラテジー B: test (SDK 指定なし、xcodebuild が自動選択)
+          rm -rf "$RESULT_BUNDLE" || true
+          if xcodebuild test \
+            -project <project>.xcodeproj \
+            -scheme <scheme> \
+            -destination "$DEST" \
+            -enableCodeCoverage YES \
+            -resultBundlePath "$RESULT_BUNDLE" 2>&1; then
+            echo "xcodebuild test succeeded"
+          else
+            # ストラテジー B-2: test (検出された SDK を明示的に指定)
+            rm -rf "$RESULT_BUNDLE" || true
+            if [ -n "$MATCHING_SDK" ]; then
+              xcodebuild test \
+                -project <project>.xcodeproj \
+                -scheme <scheme> \
+                -sdk "$MATCHING_SDK" \
+                -destination "$DEST" \
+                -enableCodeCoverage YES \
+                -resultBundlePath "$RESULT_BUNDLE" 2>&1
+            else
+              echo "All xcodebuild attempts failed"
+              exit 1
+            fi
+          fi
+        fi
       else
-        # ストラテジー C: 汎用プラットフォーム指定
+        # ストラテジー B: test (SDK 指定なし)
         rm -rf "$RESULT_BUNDLE" || true
         xcodebuild test \
           -project <project>.xcodeproj \
           -scheme <scheme> \
-          -destination "platform=iOS Simulator" \
+          -destination "$DEST" \
           -enableCodeCoverage YES \
           -resultBundlePath "$RESULT_BUNDLE" 2>&1
       fi
@@ -294,19 +384,20 @@ Xcode バージョン、SDK、シミュレーター・ランタイム、デバ�
 
 **注意**: `<project>` と `<scheme>` はプロジェクト固有の値に置き換えてください。
 
-#### 4.2.8. 診断情報のアップロード
+#### 4.2.10. 診断情報のアップロード
 
-すべてのログファイルをアーティファクトとしてアップロードします。
+すべてのログファイルをアーティファクトとしてアップロードします。テストが失敗しても診断情報をアップロードするため、`if: always()` を設定します。
 
 ```yaml
 - name: Upload diagnostics artifact
+  if: ${{ always() }}
   uses: actions/upload-artifact@v4
   with:
     name: ios-test-diagnostics
     path: ${{ env.LOG_DIR }}
 ```
 
-#### 4.2.9. カバレッジのアップロード (ベスト・エフォート)
+#### 4.2.11. カバレッジのアップロード (ベスト・エフォート)
 
 テスト・カバレッジを Codecov にアップロードします (失敗しても CI を継続)。
 
@@ -391,17 +482,22 @@ jobs:
 * **Xcode バージョン**: 複数のバージョンを試行し、利用可能な最初のバージョンを使用します。
 * **シミュレーター・ランタイム**: 複数のランタイムを試行し、利用可能な最初のランタイムを使用します。
 * **デバイス選択**: 複数のデバイス名を試行し、利用可能な最初のデバイスを使用します。
-* **テスト実行**: 複数のアプローチでテストを実行し、いずれかが成功すれば CI を継続します。
+* **SDK とランタイムの自動マッチング**: ランタイム・バージョンと一致する SDK を自動検出し、SDK とランタイムのバージョン不一致の問題を回避します。
+* **デスティネーション構築**: OS バージョンを指定せず、UDID のみを使用することで、xcodebuild が自動的に適切な SDK/ランタイムをマッチングします。
+* **テスト実行**: 複数のアプローチでテストを実行し、いずれかが成功すれば CI を継続します。SDK を指定せずに実行を優先し、xcodebuild の自動選択を活用します。
 
 ### 6.2. エラーハンドリング
 
 * **カバレッジ・アップロード**: `fail_ci_if_error: false` を設定し、失敗しても CI を継続します。
-* **診断情報の保存**: すべてのログファイルをアーティファクトとして保存し、デバッグを容易にします。
+* **診断情報の保存**: すべてのログファイルをアーティファクトとして保存し、デバッグを容易にします。`if: always()` を設定し、テストが失敗しても診断情報をアップロードします。
 * **タイムアウト設定**: iOS テストジョブに `timeout-minutes: 60` を設定し、長時間実行を防止します。
+* **SDK とランタイムの不一致**: OS バージョンを指定せず、UDID のみを使用することで、xcodebuild が自動的に適切な SDK/ランタイムをマッチングし、バージョン不一致の問題を回避します。
 
 ### 6.3. ログ記録
 
 * **環境検出ログ**: Xcode バージョン、SDK、シミュレーター情報をログに記録します。
+* **ランタイム・バージョンと SDK 情報**: シミュレーターのランタイム・バージョンと検出された SDK をログに記録します。
+* **デスティネーション情報**: 構築されたデスティネーションをログに記録します。
 * **テスト実行ログ**: すべてのテスト実行コマンドの出力をログに記録します。
 * **結果バンドル**: `xcresult` 形式の結果バンドルを保存し、詳細な分析を可能にします。
 
