@@ -24,27 +24,36 @@
 
 ```
 プロジェクト名/
+├── LICENSE
+├── README.md
 ├┬─ docs/  # ドキュメント類
-│└─ `SPEC.md`
+│├─ `SPEC.md`
+│└─ `SPEC_CICD.md`  # CI/CD Workflow ドキュメント (各プロジェクト固有。共通仕様は `COMMON_SPEC_CICD.md` を参照)
 ├┬─ tools/
 │└┬─ docs-linter  # Git サブモジュール『Docs Linter』
 │　└┬─ dist/
 │　　└─ `run-textlint.js`
 ├┬─ .github/
 │└┬─ workflows/
-│　└─ docs-linter.yml
-├── LICENSE
-├── README.md
+│　├─ docs-linter.yml
+│　└─ swift-test.yml  # CI/CD ワークフロー設定 (詳細は `COMMON_SPEC_CICD.md` を参照)
+├┬─ scripts/  # スクリプト
+│└─ test-local.sh  # ローカル・テスト実行スクリプト (統合版、汎用的)
 ├── アプリのエントリーポイント.swift
+├── Package.swift  # Swift Package 定義 (プロジェクト・ファイル兼用の場合あり)
+├── project.yml  # XcodeGen 設定ファイル
 ├── プロジェクト名.swift
 ├┬─ Sources/
-│└┬─ プロジェクト名/
-│　└┬─ Resources/
+│└┬─ プロジェクト名/  # メイン・ソースコード
+│　└┬─ Resources/  # リソースファイル
 │　　├─ Images.xcassets
-│　　├─ `Assets.xcassets`
-│　　└─ Localizable.strings  // (Base、ja、en、…)
+│　　├┬─ `Assets.xcassets`
+│　　│└─ Contents.json
+│　　├─ Base.lproj/Localizable.strings  # ローカライゼーション
+│　　├─ en.lproj/Localizable.strings  # ローカライゼーション
+│　　└─ ja.lproj/Localizable.strings  # ローカライゼーション
 ├┬─ Tests/
-│└── プロジェクト名Tests/
+│└── プロジェクト名Tests/  # テストコード
 ├── UITests/
 └── Preview Content/
 ```
@@ -71,10 +80,12 @@
 * XCTest によるユニットテストを必須にしてください。
 * UI コンポーネントは SnapshotTesting を実施してください。
 * カバレッジ目標は70%以上とします。
+* CI/CD でのテスト実行やカバレッジ計測については、`COMMON_SPEC_CICD.md` を参照してください。
 
 ## ドキュメント
 * 各プロジェクトの個別仕様は、各リポジトリ内の `SPEC.md` に記載します。
 * 各プロジェクトでは、必要に応じて派生 `SPEC.md` を追加することがあります。
+* CI/CD ワークフローに関する詳細は、`COMMON_SPEC_CICD.md` を参照してください。
 
 ---
 
@@ -375,6 +386,7 @@ playground.xcworkspace
   * `feature/xxx`: 新機能の開発用ブランチ
   * `fix/xxx`: バグ修正用ブランチ
   * Pull Request → レビュー + CI 通過後マージ
+  * CI/CD ワークフローの詳細については、`COMMON_SPEC_CICD.md` を参照してください。
 
 * **コミットメッセージ規約**
 
@@ -386,16 +398,8 @@ playground.xcworkspace
 * **PR / レビュー運用**
 
   * 少ないファイル差分で提出
-  * レビュー承認前に CI が通ること
+  * レビュー承認前に CI が通ること (CI/CD ワークフローの詳細は `COMMON_SPEC_CICD.md` を参照)
   * (オプション) マージ前に rebase/squash を行う
-
----
-
-### 5. CI / テストとの連携ルール
-
-* `.github/workflows` などの CI 設定ファイルは Git 管理対象
-* テストスイートが通ることをマージ条件とする
-* ビルドキャッシュや生成物は Git 管理しない
 
 ---
 
@@ -415,7 +419,7 @@ playground.xcworkspace
 | --- | --- | --- | --- |
 | 設計・ひな型生成 | **Cursor** / ChatGPT | SPEC.md/COMMON_SPEC の読解、Swift Package 構造の生成 | 長文仕様の理解に適する |
 | 実装・検証 | **Xcode (AI Chat)** | SwiftUI コード補完、ビルドエラー修正、UI 微調整 | Swift 実行環境と統合 |
-| 品質保証・レビュー | **Docs Linter** / SwiftLint / SwiftFormat | コード整形、表記揺れ、Lint 検査 | CI 統合を推奨 |
+| 品質保証・レビュー | **Docs Linter** / SwiftLint / SwiftFormat | コード整形、表記揺れ、Lint 検査 | CI 統合を推奨 (詳細は `COMMON_SPEC_CICD.md` を参照) |
 
 ---
 
@@ -447,6 +451,7 @@ Xcode: 実装・ビルド・テスト
 Git Commit (ai-dev/xcode ブランチ)
 ↓
 CI: Docs Linter + SwiftLint + Snapshot Testing
+(CI/CD ワークフローの詳細は `COMMON_SPEC_CICD.md` を参照)
 ↓
 Release
 ```
@@ -474,6 +479,8 @@ Release
 
 ## 5. 品質保証と CI 連携
 
+* **注意**: CI/CD ワークフローの詳細な設定や実装については、`COMMON_SPEC_CICD.md` を参照してください。
+
 ### 5.1. 自動検査ツール
 
 | ツール | 検査対象 | 実行タイミング |
@@ -481,26 +488,6 @@ Release
 | Docs Linter | ドキュメントの表記揺れ・文体統一 | PR 時 |
 | SwiftLint / SwiftFormat | Swift コード規約 | コミット時または CI |
 | SnapshotTesting | SwiftUI ビューの UI 再現性 | テスト実行時 |
-
-### 5.2. 推奨 GitHub Actions
-
-```yaml
-# .github/workflows/ai-ci.yml
-name: AI CI
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: cd tools/docs-linter && npm ci && npm run lint
-      - run: swift test --enable-code-coverage
-```
 
 ---
 
