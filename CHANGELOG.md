@@ -2,6 +2,17 @@
 
 ## unreleased
 
+## 2.0.2 - 2026-08-13
+
+### Added
+
+* `package.json` に `allowScripts` を追加し、`@s2j/docs-linter` の install スクリプトを許可
+* `.npmignore` を追加し、npm の gitignore-fallback 警告を回避
+
+### Changed
+
+* `@s2j/docs-linter` を v1.0.22に更新
+
 ## 2.0.1 - 2026-07-23
 
 ### Added

@@ -1,0 +1,12 @@
+# Published files are listed in package.json "files".
+# This file exists so npm does not fall back to .gitignore.
+
+node_modules/
+.DS_Store
+.sandbox/
+.cursor/
+.vscode/
+.github/
+.npmrc
+.textlintrc.json
+package-lock.json
