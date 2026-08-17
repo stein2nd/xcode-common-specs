@@ -19,8 +19,8 @@
 | 対象 | 共有するもの | 共有しないもの |
 | --- | --- | --- |
 | iOS / iPadOS | ドメイン判断、データモデル、Repository 相当、キャッシュ方針、統計、バリデーション、画面・操作・状態の語彙 | SwiftUI 実装、UIKit、Observation / Combine、プラットフォーム I/O |
-| iOS / iPadOS → Android | 上記の移植層。UI 語彙は iOS / iPadOS の体験を基準にする | ウィジェットの 1 対 1 対応。相手側に無い操作 (スワイプバック等) |
-| macOS | FOP、Clean Architecture の部分借用、ドキュメント運用、自動テストの印 | Windows 11 互換。iOS 向けナビゲーション語彙の強制。KMP 必須化 |
+| iOS / iPadOS → Android | 上記の移植層。UI 語彙は iOS / iPadOS の体験を基準にする | ウィジェットの1対1対応。相手側に無い操作 (スワイプバック等) |
+| macOS | FOP、Clean Architecture の部分借用、ドキュメント運用、自動テストの印 | Windows 11互換。iOS 向けナビゲーション語彙の強制。KMP 必須化 |
 
 ## 設計方針
 
