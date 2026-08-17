@@ -457,7 +457,7 @@ build-release:
 
 | ツール | 検査対象 | 実行タイミング |
 | --- | --- | --- |
-| Docs Linter | ドキュメントの表記揺れ・文体統一 | PR 時 |
+| `@s2j/docs-linter` | ドキュメントの表記揺れ・文体統一 | PR 時 |
 | SwiftLint / SwiftFormat | Swift コード規約 | コミット時または CI |
 | SnapshotTesting | SwiftUI ビューの UI 再現性 | テスト実行時 |
 

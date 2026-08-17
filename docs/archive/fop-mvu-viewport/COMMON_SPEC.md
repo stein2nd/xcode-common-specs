@@ -427,7 +427,7 @@ playground.xcworkspace
 | --- | --- | --- | --- |
 | 設計・ひな型生成 | **Cursor** / ChatGPT | SPEC.md/COMMON_SPEC の読解、Swift Package 構造の生成 | 長文仕様の理解に適する |
 | 実装・検証 | **Xcode (AI Chat)** | SwiftUI コード補完、ビルドエラー修正、UI 微調整 | Swift 実行環境と統合 |
-| 品質保証・レビュー | **Docs Linter** / SwiftLint / SwiftFormat | コード整形、表記揺れ、Lint 検査 | CI 統合を推奨 (詳細は `COMMON_SPEC_CICD.md` を参照) |
+| 品質保証・レビュー | **`@s2j/docs-linter`** / SwiftLint / SwiftFormat | コード整形、表記揺れ、Lint 検査 | CI 統合を推奨 (詳細は `COMMON_SPEC_CICD.md` を参照) |
 
 ---
 
@@ -449,19 +449,13 @@ playground.xcworkspace
 
 ### 標準ワークフロー
 
-```
-Cursor: 設計・雛形生成
-↓
-Git Commit (ai-dev/cursor ブランチ)
-↓
-Xcode: 実装・ビルド・テスト
-↓
-Git Commit (ai-dev/xcode ブランチ)
-↓
-CI: Docs Linter + SwiftLint + Snapshot Testing
-(CI/CD ワークフローの詳細は `COMMON_SPEC_CICD.md` を参照)
-↓
-Release
+```mermaid
+flowchart TD
+  A["Cursor: 設計・雛形生成"] --> B["Git Commit (ai-dev/cursor ブランチ)"]
+  B --> C["Xcode: 実装・ビルド・テスト"]
+  C --> D["Git Commit (ai-dev/xcode ブランチ)"]
+  D --> E["CI: `@s2j/docs-linter` + SwiftLint + Snapshot Testing (CI/CD ワークフローの詳細は `COMMON_SPEC_CICD.md` を参照)"]
+  E --> F["Release"]
 ```
 
 | 手順 | 内容 | 留意点 |
@@ -469,7 +463,7 @@ Release
 | ① | Cursor に SPEC.md 全体を読み込ませ、Swift Package ひな型を生成 | 「macOS/iPadOS 両対応」と明示 |
 | ② | 生成後に `git commit` し、バージョンを固定 | 構成誤差を防ぐ |
 | ③ | Xcode で開き、AI チャットに SPEC 抜粋を渡してチューニング | コンテキスト上限に注意 |
-| ④ | Docs Linter と SwiftLint を併用 | 出力差を自動整形 |
+| ④ | `@s2j/docs-linter` と SwiftLint を併用 | 出力差を自動整形 |
 | ⑤ | PR 時に AI 生成差分を明示 | レビュー担当者が仕様逸脱を確認可能 |
 
 ---
@@ -493,7 +487,7 @@ Release
 
 | ツール | 検査対象 | 実行タイミング |
 | --- | --- | --- |
-| Docs Linter | ドキュメントの表記揺れ・文体統一 | PR 時 |
+| `@s2j/docs-linter` | ドキュメントの表記揺れ・文体統一 | PR 時 |
 | SwiftLint / SwiftFormat | Swift コード規約 | コミット時または CI |
 | SnapshotTesting | SwiftUI ビューの UI 再現性 | テスト実行時 |
 
