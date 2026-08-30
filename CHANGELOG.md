@@ -2,6 +2,14 @@
 
 ## unreleased
 
+## 2.0.4 - 2026-08-31
+
+### Changed
+
+* `docs/SPECS.md` の適用範囲表の表記を整える (「1対1」「Windows 11互換」)
+* `@s2j/docs-linter` を ^1.0.22 から ^1.0.23 に更新
+* `package.json` のバージョンを v2.0.4に更新
+
 ## 2.0.3 - 2026-08-17
 
 ### Added
