@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 2.0.5 - 2026-09-29
+
+### Changed
+
+* `@s2j/docs-linter` を ^1.0.23 から ^1.0.25に更新
+* `package.json` のバージョンを v2.0.5に更新
+
 ## 2.0.4 - 2026-08-31
 
 ### Changed
