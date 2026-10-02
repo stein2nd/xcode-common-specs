@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 2.0.6 - 2026-10-02
+
+### Changed
+
+* 非推奨の `npm.enableScriptExplorer` を削除し、`json.schemaDownload.enable` を有効にする
+* `@s2j/docs-linter` を ^1.0.25 から ^1.0.26に更新
+
 ## 2.0.5 - 2026-09-29
 
 ### Changed
