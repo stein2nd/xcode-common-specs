@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 2.0.8 - 2026-11-06
+
+### Changed
+
+* `docs/CICD.md` の推奨ワークフロー例でドキュメント lint 用 Node.js を v24に指定し、非推奨 Annotations を避ける旨を追記
+* `.github/workflows/docs-lint.yml` の `node-version` を v20から v24に更新
+
 ## 2.0.7 - 2026-11-05
 
 ### Changed

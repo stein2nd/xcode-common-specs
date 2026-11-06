@@ -466,6 +466,8 @@ build-release:
 
 AI 伴走開発との統合を想定したワークフロー例：
 
+GitHub Actions では Node.js v20系で `Node.js 20 is deprecated.` の Annotations が出やすいため、ドキュメント lint 用の `node-version` は **24** を指定します。
+
 ```yaml
 # .github/workflows/ai-ci.yml
 name: AI CI
@@ -479,7 +481,7 @@ jobs:
           submodules: true
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
       - run: cd tools/docs-linter && npm ci && npm run lint
       - run: swift test --enable-code-coverage
 ```
