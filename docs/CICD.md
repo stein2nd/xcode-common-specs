@@ -67,7 +67,7 @@ jobs:
 
 ```yaml
 - name: Checkout
-  uses: actions/checkout@v4
+  uses: actions/checkout@v5
   with:
     submodules: true  # Git サブモジュール (例: docs-linter) を含める場合
 ```
@@ -466,7 +466,9 @@ build-release:
 
 AI 伴走開発との統合を想定したワークフロー例：
 
-GitHub Actions では Node.js v20系で `Node.js 20 is deprecated.` の Annotations が出やすいため、ドキュメント lint 用の `node-version` は **24** を指定します。
+GitHub Actions の `Node.js 20 is deprecated.` は、**アクション本体**が Node.js v20ランタイムの `@v4` 系 (`actions/checkout`, `actions/setup-node` など) を使っているときに出ます。Node.js v24ランタイムの **`@v5` 以降**に更新してください。`npm` / `textlint` 用の Node.js は別途 `node-version: 24` を指定します。
+
+Linux ジョブで `ubuntu-latest` を使うと、イメージ移行予告の Annotations が出ることがあります。ドキュメント lint などでは `ubuntu-24.04` のように OS ラベルを固定すると、予告を避けやすく環境も安定します。
 
 ```yaml
 # .github/workflows/ai-ci.yml
@@ -476,10 +478,10 @@ jobs:
   test:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
       - run: cd tools/docs-linter && npm ci && npm run lint
@@ -627,7 +629,7 @@ jobs:
   test-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
@@ -644,7 +646,7 @@ jobs:
     env:
       LOG_DIR: /tmp/gha-ios-logs
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # Xcode バージョン選択 (フォールバック付き)
       # シミュレーター選択と起動
       # テスト実行 (マルチ・ストラテジー)
@@ -655,7 +657,7 @@ jobs:
     runs-on: macos-latest
     needs: [test-macos, test-ios]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable

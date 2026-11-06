@@ -2,6 +2,13 @@
 
 ## unreleased
 
+## 2.0.9 - 2026-11-06
+
+### Changed
+
+* `docs/CICD.md` で GitHub Actions の Node.js v20非推奨 Annotations の原因 (アクション runtime と `node-version` の区別) を整理し、`actions/checkout` / `actions/setup-node` を `@v5`、Linux ジョブの `runs-on` を `ubuntu-24.04` 固定とする方針を追記
+* `.github/workflows/docs-lint.yml` の `runs-on` を `ubuntu-24.04` に固定し、`actions/checkout` / `actions/setup-node` を `@v5` に更新
+
 ## 2.0.8 - 2026-11-06
 
 ### Changed
